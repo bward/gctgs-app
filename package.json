@@ -1,0 +1,16 @@
+{
+  "name": "gctgs-app",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "postinstall": "typings b install",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "android": "adb reverse tcp:8081 tcp:8081 && node node_modules/react-native/local-cli/cli.js run-android",
+    "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "react": "15.3.1",
+    "react-native": "0.33.0"
+  }
+}
