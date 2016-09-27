@@ -11,8 +11,9 @@ import {
   Linking,
   AsyncStorage
 } from 'react-native';
-import { BoardGameList } from './BoardGameList.react'
-import { User } from './models/User';
+import { GctgsWebClient } from '../GctgsWebClient';
+import { BoardGameList } from './BoardGameList.react';
+import { User } from '../models/User';
 
 interface GctgsAppState {
   user: User | null;
