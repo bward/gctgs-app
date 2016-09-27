@@ -9,7 +9,10 @@ import {
   AppRegistry,
   WebView,
   Linking,
-  AsyncStorage
+  AsyncStorage,
+  View,
+  Text,
+  ToolbarAndroid
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
 import { BoardGameList } from './BoardGameList.react';
@@ -17,28 +20,40 @@ import { User } from '../models/User';
 
 interface GctgsAppState {
   user: User | null;
+  client: GctgsWebClient;
 }
 
 export class GctgsApp extends React.Component<{}, GctgsAppState> {
 
   public constructor() {
     super();
-    this.state = {user: null};
+    this.state = {user: null, client: new GctgsWebClient()};
   }
 
   public render() {
+    console.log(this.state);
     if (this.state.user == null)
       return (
-        <WebView source={{ uri: 'https://gctgs.ben-ward.net/api/authenticate' }} />
+        <View style={{flex: 1}}>
+          <ToolbarAndroid
+                      title="Log In With Raven"
+                      titleColor="#ffffff"
+                      style={{height: 56, backgroundColor: "#009900"}} />
+          <WebView source={{uri: 'https://gctgs.ben-ward.net/api/authenticate'}} />
+        </View>
       );
-    else
-      return (<BoardGameList user = { this.state.user } />);
+    else {
+      console.log('rendering', this.state.user.name)
+      return (<BoardGameList user = { this.state.user }
+                             client = { this.state.client} />);
+    }
+      
   }
 
   public componentWillMount() {
     AsyncStorage.getItem('user')
       .then((value: string) => {
-        this.setState({user: JSON.parse(value)});
+        this.setState({user: JSON.parse(value)} as GctgsAppState);
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
@@ -46,6 +61,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   private authenticationHandler(event: {url: string}) {
     let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
     AsyncStorage.setItem('user', userData)
-    this.setState({user: JSON.parse(userData) as User})
+    this.setState({user: JSON.parse(userData) as User} as GctgsAppState)
   }
 }
