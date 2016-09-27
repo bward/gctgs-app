@@ -5,5 +5,5 @@ export class BoardGame {
   constructor(public name: string,
               public location: string,
               public owner: User,
-              public bggDetails: BggDetails | null) {};
+              public bggDetails: BggDetails) {};
 }
