@@ -7,47 +7,44 @@
 import * as React from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
+  WebView,
+  Linking,
+  AsyncStorage
 } from 'react-native';
+import { BoardGameList } from './BoardGameList.react'
+import { User } from './models/User';
 
-class GctgsApp extends React.Component<{}, {}> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native, GCTGS!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
-  }
+interface GctgsAppState {
+  user: User | null;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  } as React.ViewStyle,
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  } as React.TextStyle,
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  } as React.TextStyle,
-});
+export class GctgsApp extends React.Component<{}, GctgsAppState> {
 
-export default GctgsApp;
+  public constructor() {
+    super();
+    this.state = {user: null};
+  }
+
+  public render() {
+    if (this.state.user == null)
+      return (
+        <WebView source={{ uri: 'https://gctgs.ben-ward.net/api/authenticate' }} />
+      );
+    else
+      return (<BoardGameList user = { this.state.user } />);
+  }
+
+  public componentWillMount() {
+    AsyncStorage.getItem('user')
+      .then((value: string) => {
+        this.setState({user: JSON.parse(value)});
+      })
+    Linking.addEventListener('url', this.authenticationHandler.bind(this));
+  }
+
+  private authenticationHandler(event: {url: string}) {
+    let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
+    AsyncStorage.setItem('user', userData)
+    this.setState({user: JSON.parse(userData) as User})
+  }
+}
