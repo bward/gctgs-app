@@ -39,6 +39,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
       <View style={{flex: 1}}>
         <ToolbarAndroid
           title = "GCTGS"
+          subtitle = {this.props.user.name}
           titleColor = "#ffffff"
           style = {{height: 56, backgroundColor: "#009900"}}
         />
