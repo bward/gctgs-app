@@ -15,7 +15,7 @@ import {
   ToolbarAndroid
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
-import { BoardGameList } from './BoardGameList.react';
+import { BoardGameList } from './BoardGameList/BoardGameList.react';
 import { User } from '../models/User';
 
 interface GctgsAppState {
