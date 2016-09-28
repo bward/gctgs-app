@@ -1,4 +1,4 @@
-package com.gctgsapp;
+package net.benward.gctgs;
 
 import com.facebook.react.ReactActivity;
 

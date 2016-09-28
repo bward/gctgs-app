@@ -1,4 +1,4 @@
-package com.gctgsapp;
+package net.benward.gctgs;
 
 import android.app.Application;
 import android.util.Log;
