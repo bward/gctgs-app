@@ -68,7 +68,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
     this.setState({refreshing: true} as BoardGameListState);
     this.props.client.getBoardGames(this.props.user)
       .then((boardGames: BoardGame[]) => {
-        console.log(boardGames);
         const {dataBlob, sectionIds, rowIds} = this.formatData(boardGames);
         this.setState({
           boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds),

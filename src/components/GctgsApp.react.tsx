@@ -21,7 +21,7 @@ import { NavigationView } from './NavigationView.react';
 import { BoardGameList } from './BoardGameList/BoardGameList.react';
 import { User } from '../models/User';
 
-// const CookieManager = require('react-native-cookies');
+const CookieManager = require('react-native-cookies');
 
 interface GctgsAppState {
   user: User | null;
@@ -42,7 +42,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
           <ToolbarAndroid
                       title="Log In With Raven"
                       titleColor="#ffffff"
-                      style={{height: 56, backgroundColor: "#009900"}} />
+                      style={styles.toolbar} />
           <WebView source={{uri: 'https://gctgs.ben-ward.net/api/authenticate'}} />
         </View>
       );
@@ -53,7 +53,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
           drawerPosition = {DrawerLayoutAndroid.positions.Left}
           renderNavigationView = {() => <NavigationView
                                           user = {this.state.user as User}
-                                          onLogOut = {() => this.setState({user: null} as GctgsAppState)} />}
+                                          onLogOut = {this.logOut.bind(this)} />}
           ref = {'DRAWER_REF'}>
           <ToolbarAndroid
             title = "GCTGS"
@@ -74,7 +74,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     AsyncStorage.getItem('user')
       .then((value: string) => {
         this.setState({user: JSON.parse(value)} as GctgsAppState);
-        // CookieManager.clearAll();
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
@@ -82,7 +81,13 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   private authenticationHandler(event: {url: string}) {
     let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
     AsyncStorage.setItem('user', userData)
-    this.setState({user: JSON.parse(userData) as User} as GctgsAppState)
+    this.setState({user: JSON.parse(userData) as User} as GctgsAppState);
+  }
+
+  private logOut() {
+    CookieManager.clearAll((err: any, res: any) => {
+      this.setState({user: null} as GctgsAppState);
+    });
   }
 }
 
