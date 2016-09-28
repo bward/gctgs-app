@@ -9,9 +9,9 @@ import {
   StyleSheet
 } from 'react-native';
 import { BoardGameListRow } from './BoardGameListRow.react'
-import { GctgsWebClient } from '../GctgsWebClient';
-import { BoardGame } from '../models/BoardGame';
-import { User } from '../models/User';
+import { GctgsWebClient } from '../../GctgsWebClient';
+import { BoardGame } from '../../models/BoardGame';
+import { User } from '../../models/User';
 
 interface BoardGameListProps {
   user: User;
@@ -34,20 +34,17 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   }
 
   public render() {
-    console.log('rendering!');
     return (
       <View style={{flex: 1}}>
         <ToolbarAndroid
           title = "GCTGS"
-          subtitle = {this.props.user.name}
           titleColor = "#ffffff"
-          style = {{height: 56, backgroundColor: "#009900"}}
+          style = {styles.toolbar}
         />
         <ListView
           dataSource = {this.state.boardGames}
           renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
           enableEmptySections = { true }
-          renderSeparator = {(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
           refreshControl = {<RefreshControl refreshing = {this.state.refreshing}
                                             onRefresh = {this.onRefresh.bind(this)} />}
         />
@@ -69,8 +66,9 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 }
 
 const styles = StyleSheet.create({
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#8E8E8E',
-  } as React.ViewStyle
+  toolbar: {
+    height: 56,
+    backgroundColor:
+    "#009900",
+    elevation: 4} as React.ViewStyle,
 })
