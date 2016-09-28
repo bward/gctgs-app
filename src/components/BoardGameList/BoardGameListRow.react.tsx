@@ -27,6 +27,7 @@ export class BoardGameListRow extends React.Component<BoardGameListRowProps, {}>
     );
   }
 }
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
