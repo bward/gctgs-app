@@ -12,11 +12,16 @@ import {
   AsyncStorage,
   View,
   Text,
-  ToolbarAndroid
+  DrawerLayoutAndroid,
+  ToolbarAndroid,
+  StyleSheet
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
+import { NavigationView } from './NavigationView.react';
 import { BoardGameList } from './BoardGameList/BoardGameList.react';
 import { User } from '../models/User';
+
+// const CookieManager = require('react-native-cookies');
 
 interface GctgsAppState {
   user: User | null;
@@ -42,8 +47,25 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
         </View>
       );
     else {
-      return (<BoardGameList user = { this.state.user }
-                             client = { this.state.client} />);
+      return (
+        <DrawerLayoutAndroid
+          drawerWidth = {304}
+          drawerPosition = {DrawerLayoutAndroid.positions.Left}
+          renderNavigationView = {() => <NavigationView
+                                          user = {this.state.user as User}
+                                          onLogOut = {() => this.setState({user: null} as GctgsAppState)} />}
+          ref = {'DRAWER_REF'}>
+          <ToolbarAndroid
+            title = "GCTGS"
+            titleColor = "#ffffff"
+            navIcon= {{ uri: 'ic_menu_black_24dp', isStatic: true }}
+            onIconClicked={() => (this.refs['DRAWER_REF'] as any).openDrawer()}
+            style = {styles.toolbar} />
+          <BoardGameList
+            user = { this.state.user }
+            client = { this.state.client} />
+        </DrawerLayoutAndroid>
+      );
     }
       
   }
@@ -52,6 +74,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     AsyncStorage.getItem('user')
       .then((value: string) => {
         this.setState({user: JSON.parse(value)} as GctgsAppState);
+        // CookieManager.clearAll();
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
@@ -62,3 +85,11 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     this.setState({user: JSON.parse(userData) as User} as GctgsAppState)
   }
 }
+
+const styles = StyleSheet.create({
+  toolbar: {
+    height: 56,
+    backgroundColor:
+    "#009900",
+    elevation: 4} as React.ViewStyle,
+});

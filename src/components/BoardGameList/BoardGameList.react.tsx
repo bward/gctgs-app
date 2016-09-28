@@ -44,11 +44,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   public render() {
     return (
       <View style={{flex: 1}}>
-        <ToolbarAndroid
-          title = "GCTGS"
-          titleColor = "#ffffff"
-          style = {styles.toolbar}
-        />
         {this.state.boardGames.getRowCount() > 0
           ? <ListView
               dataSource = {this.state.boardGames}
@@ -116,12 +111,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 }
 
 const styles = StyleSheet.create({
-  toolbar: {
-    height: 56,
-    backgroundColor:
-    "#009900",
-    elevation: 4} as React.ViewStyle,
-  
   listHeader: {
     paddingTop: 16
   } as React.ViewStyle,
