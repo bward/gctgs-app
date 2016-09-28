@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  ActivityIndicator,
   Text,
   View,
   ToolbarAndroid,
@@ -34,7 +35,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
       getSectionHeaderData: (dataBlob: any, sectionId: string) => dataBlob[sectionId],
       getRowData: (dataBlob: any, sectionId: string, rowId: string) => dataBlob[`${rowId}`]
     });
-
     this.state = {
       boardGames: dataSource.cloneWithRowsAndSections([]),
       refreshing: false
@@ -42,7 +42,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   }
 
   public render() {
-    console.log('rendering!');
     return (
       <View style={{flex: 1}}>
         <ToolbarAndroid
@@ -50,16 +49,18 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
           titleColor = "#ffffff"
           style = {styles.toolbar}
         />
-        <ListView
-          dataSource = {this.state.boardGames}
-          renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
-          renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
-          renderHeader = {() => <View style = {styles.listHeader} />}
-          enableEmptySections = { true }
-          refreshControl = {<RefreshControl
-                              refreshing = {this.state.refreshing}
-                              onRefresh = {this.onRefresh.bind(this)} />}
-        />
+        {this.state.boardGames.getRowCount() > 0
+          ? <ListView
+              dataSource = {this.state.boardGames}
+              renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
+              renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
+              renderHeader = {() => <View style = {styles.listHeader} />}
+              enableEmptySections = { true }
+              refreshControl = {<RefreshControl
+                                  refreshing = {this.state.refreshing}
+                                  onRefresh = {this.onRefresh.bind(this)} />}
+            />
+          : <ActivityIndicator size = 'large' style = {{flex: 1}}/> }
       </View>
     );
   }
@@ -69,45 +70,46 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   }
 
   private onRefresh() {
+    this.setState({refreshing: true} as BoardGameListState);
     this.props.client.getBoardGames(this.props.user)
       .then((boardGames: BoardGame[]) => {
         console.log(boardGames);
         const {dataBlob, sectionIds, rowIds} = this.formatData(boardGames);
-        this.setState({boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds)} as BoardGameListState)
+        this.setState({
+          boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds),
+          refreshing: false
+        } as BoardGameListState);
       });
   }
 
   private formatData(data: BoardGame[]): {dataBlob: {[id: string]: BoardGame | {title: string}}, sectionIds: string[], rowIds: string[][]} {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const dataBlob: {[id: string]: BoardGame | {title: string}} = {'#': {title: '#'}};
     const sectionIds: string[] = ['#'];
     const rowIds: string[][] = [[]];
 
     for (let i = 0; i < 10; i++) {
-      const boardGames = data.filter(boardGame => boardGame.name.toUpperCase()[0] === i.toString());
-      for (let j = 0; j < boardGames.length; j++) {
-        const rowId = `#:${i}${j}`;
-        rowIds[rowIds.length - 1].push(rowId);
-        dataBlob[rowId] = boardGames[j];
-      }
+      data.filter(boardGame => boardGame.name.toUpperCase()[0] === i.toString())
+        .map((value, index) => {
+          const rowId = `#:${i}${index}`;
+          rowIds[rowIds.length - 1].push(rowId);
+          dataBlob[rowId] = value;
+        });
     }
 
-    for (let i = 0; i < alphabet.length; i++) {
-      const character = alphabet[i];
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((character) => {
       const boardGames = data.filter(boardGame => boardGame.name.toUpperCase()[0] === character);
       
       if (boardGames.length > 0) {
         sectionIds.push(character);
         dataBlob[character] = {title: character};
         rowIds.push([]);
-
-        for (let j = 0; j < boardGames.length; j++) {
-          const rowId = `${character}:${j}`;
+        boardGames.map((boardGame, index) => {
+          const rowId = `${character}:${index}`;
           rowIds[rowIds.length - 1].push(rowId);
-          dataBlob[rowId] = boardGames[j];
-        }
+          dataBlob[rowId] = boardGame;
+        });
       }
-    }
+    });
 
     return {dataBlob, sectionIds, rowIds};
   }
