@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/react": "^0.14.36",
     "@types/react-native": "^0.29.33",
+    "@types/whatwg-fetch": "0.0.31",
     "react": "15.3.1",
     "react-native": "^0.34.0"
   }
