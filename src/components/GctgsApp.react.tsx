@@ -31,7 +31,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   }
 
   public render() {
-    console.log(this.state);
     if (this.state.user == null)
       return (
         <View style={{flex: 1}}>
@@ -43,7 +42,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
         </View>
       );
     else {
-      console.log('rendering', this.state.user.name)
       return (<BoardGameList user = { this.state.user }
                              client = { this.state.client} />);
     }

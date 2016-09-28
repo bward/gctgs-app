@@ -13,8 +13,8 @@ export class BoardGameListSectionHeader extends React.Component<BoardGameListSec
   public render() {
     return (
       <View style = {styles.container}>
-        <Text>{this.props.title}</Text>
-        <View style = {styles.separator} />
+        <View style = {styles.titleContainer}><Text>{this.props.title}</Text></View>
+        {this.props.title != '#' ? <View style = {styles.separator} /> : null}
       </View>
     );
   }
@@ -26,17 +26,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems:'center',
+    paddingLeft: 16,
   } as React.ViewStyle,
+  
+  titleContainer: {
+    flex: 88,
+  } as React.ViewStyle,
+
   text: {
-    flex: 1,
-    marginRight: 20
-  },
+  } as React.TextStyle,
+
   separator: {
+    flex: 344,
     height: StyleSheet.hairlineWidth,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: 360,
     backgroundColor: '#000000',
     opacity: .18,
   } as React.ViewStyle

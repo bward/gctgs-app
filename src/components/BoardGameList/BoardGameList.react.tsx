@@ -54,6 +54,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
           dataSource = {this.state.boardGames}
           renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
           renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
+          renderHeader = {() => <View style = {styles.listHeader} />}
           enableEmptySections = { true }
           refreshControl = {<RefreshControl
                               refreshing = {this.state.refreshing}
@@ -77,10 +78,19 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   }
 
   private formatData(data: BoardGame[]): {dataBlob: {[id: string]: BoardGame | {title: string}}, sectionIds: string[], rowIds: string[][]} {
-    const alphabet = '1ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const dataBlob: {[id: string]: BoardGame | {title: string}} = {};
-    const sectionIds: string[] = [];
-    const rowIds: string[][] = [];
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const dataBlob: {[id: string]: BoardGame | {title: string}} = {'#': {title: '#'}};
+    const sectionIds: string[] = ['#'];
+    const rowIds: string[][] = [[]];
+
+    for (let i = 0; i < 10; i++) {
+      const boardGames = data.filter(boardGame => boardGame.name.toUpperCase()[0] === i.toString());
+      for (let j = 0; j < boardGames.length; j++) {
+        const rowId = `#:${i}${j}`;
+        rowIds[rowIds.length - 1].push(rowId);
+        dataBlob[rowId] = boardGames[j];
+      }
+    }
 
     for (let i = 0; i < alphabet.length; i++) {
       const character = alphabet[i];
@@ -109,6 +119,10 @@ const styles = StyleSheet.create({
     backgroundColor:
     "#009900",
     elevation: 4} as React.ViewStyle,
+  
+  listHeader: {
+    paddingTop: 16
+  } as React.ViewStyle,
     
   separator: {
     height: StyleSheet.hairlineWidth,
