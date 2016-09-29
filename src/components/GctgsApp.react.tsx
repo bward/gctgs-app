@@ -6,7 +6,6 @@
 
 import * as React from 'react';
 import {
-  AppRegistry,
   WebView,
   Linking,
   AsyncStorage,
@@ -14,7 +13,8 @@ import {
   Text,
   DrawerLayoutAndroid,
   ToolbarAndroid,
-  StyleSheet
+  StyleSheet,
+  Navigator
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
 import { NavigationView } from './NavigationView.react';
@@ -36,37 +36,18 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   }
 
   public render() {
-    if (this.state.user == null)
-      return (
-        <View style={{flex: 1}}>
-          <ToolbarAndroid
-                      title="Log In With Raven"
-                      titleColor="#ffffff"
-                      style={styles.toolbar} />
-          <WebView source={{uri: 'https://gctgs.ben-ward.net/api/authenticate'}} />
-        </View>
-      );
-    else {
-      return (
-        <DrawerLayoutAndroid
-          drawerWidth = {304}
-          drawerPosition = {DrawerLayoutAndroid.positions.Left}
-          renderNavigationView = {() => <NavigationView
-                                          user = {this.state.user as User}
-                                          onLogOut = {this.logOut.bind(this)} />}
-          ref = {'DRAWER_REF'}>
-          <ToolbarAndroid
-            title = "GCTGS"
-            titleColor = "#ffffff"
-            navIcon= {{ uri: 'ic_menu_black_24dp', isStatic: true }}
-            onIconClicked={() => (this.refs['DRAWER_REF'] as any).openDrawer()}
-            style = {styles.toolbar} />
-          <BoardGameList
-            user = { this.state.user }
-            client = { this.state.client} />
-        </DrawerLayoutAndroid>
-      );
-    }
+    const routes = [
+      {id: 'boardGameList'},
+      {id: 'boardGameDetails'}
+    ];
+   
+    return (
+      <Navigator
+        initialRoute = {routes[0]}
+        initialRouteStack = {routes}
+        renderScene = {(route, navigator) => this.renderNavigatorScene(route, navigator) as React.ReactElement<React.ViewProperties>}
+      />
+    );
       
   }
 
@@ -76,6 +57,34 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
         this.setState({user: JSON.parse(value)} as GctgsAppState);
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
+  }
+
+  private renderNavigatorScene(route: React.Route, navigator: Navigator): React.ReactElement<React.ViewProperties> | undefined {
+    if (this.state.user == null)
+      return (
+        <View style={{flex: 1}}>
+          <ToolbarAndroid
+            title="Log In With Raven"
+            titleColor="#ffffff"
+            style={styles.toolbar} />
+          <WebView source={{uri: 'https://gctgs.ben-ward.net/api/authenticate'}} />
+        </View>
+      );
+
+    switch (route.id) {
+      case 'boardGameList':
+        return (
+          <BoardGameList
+            user = {this.state.user}
+            client = {this.state.client}
+            logOut = {this.logOut.bind(this)}
+            navigator = {navigator} />
+        );
+      case 'boardGameDetails':
+        return (
+          <Text>Deets</Text>
+        )
+    }
   }
 
   private authenticationHandler(event: {url: string}) {

@@ -7,10 +7,12 @@ import {
   ListView,
   ListViewDataSource,
   RefreshControl,
+  DrawerLayoutAndroid,
   StyleSheet
 } from 'react-native';
 import { BoardGameListRow } from './BoardGameListRow.react';
 import { BoardGameListSectionHeader } from './BoardGameListSectionHeader.react';
+import { NavigationView } from '../NavigationView.react';
 import { GctgsWebClient } from '../../GctgsWebClient';
 import { BoardGame } from '../../models/BoardGame';
 import { User } from '../../models/User';
@@ -18,6 +20,8 @@ import { User } from '../../models/User';
 interface BoardGameListProps {
   user: User;
   client: GctgsWebClient;
+  logOut: () => void;
+  navigator: React.NavigatorStatic;
 }
 
 interface BoardGameListState {
@@ -43,20 +47,37 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public render() {
     return (
-      <View style={{flex: 1}}>
-        {this.state.boardGames.getRowCount() > 0
-          ? <ListView
-              dataSource = {this.state.boardGames}
-              renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
-              renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
-              renderHeader = {() => <View style = {styles.listHeader} />}
-              enableEmptySections = { true }
-              refreshControl = {<RefreshControl
-                                  refreshing = {this.state.refreshing}
-                                  onRefresh = {this.onRefresh.bind(this)} />}
-            />
-          : <ActivityIndicator size = 'large' style = {{flex: 1}}/> }
-      </View>
+      <DrawerLayoutAndroid
+            drawerWidth = {304}
+            drawerPosition = {DrawerLayoutAndroid.positions.Left}
+            renderNavigationView = {() => <NavigationView
+                                            user = {this.props.user}
+                                            onLogOut = {this.props.logOut} />}
+            ref = {'DRAWER_REF'}>
+
+            <ToolbarAndroid
+              title = "GCTGS"
+              titleColor = "#ffffff"
+              navIcon= {{ uri: 'ic_menu_black_24dp', isStatic: true }}
+              onIconClicked={() => (this.refs['DRAWER_REF'] as any).openDrawer()}
+              style = {styles.toolbar} />
+
+              <View style={{flex: 1}}>
+                {this.state.boardGames.getRowCount() > 0
+                  ? <ListView
+                      dataSource = {this.state.boardGames}
+                      renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
+                      renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
+                      renderHeader = {() => <View style = {styles.listHeader} />}
+                      enableEmptySections = { true }
+                      refreshControl = {<RefreshControl
+                                          refreshing = {this.state.refreshing}
+                                          onRefresh = {this.onRefresh.bind(this)} />}
+                    />
+                  : <ActivityIndicator size = 'large' style = {{flex: 1}}/> }
+              </View>
+
+      </DrawerLayoutAndroid>
     );
   }
 
@@ -68,7 +89,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
     this.setState({refreshing: true} as BoardGameListState);
     this.props.client.getBoardGames(this.props.user)
       .then((boardGames: BoardGame[]) => {
-        const {dataBlob, sectionIds, rowIds} = this.formatData(boardGames);
+        const {dataBlob, sectionIds, rowIds} = this.formatDataAlphabetical(boardGames);
         this.setState({
           boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds),
           refreshing: false
@@ -76,7 +97,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
       });
   }
 
-  private formatData(data: BoardGame[]): {dataBlob: {[id: string]: BoardGame | {title: string}}, sectionIds: string[], rowIds: string[][]} {
+  private formatDataAlphabetical(data: BoardGame[]): {dataBlob: {[id: string]: BoardGame | {title: string}}, sectionIds: string[], rowIds: string[][]} {
     const dataBlob: {[id: string]: BoardGame | {title: string}} = {'#': {title: '#'}};
     const sectionIds: string[] = ['#'];
     const rowIds: string[][] = [[]];
@@ -118,5 +139,12 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#8E8E8E',
     marginLeft: 88,
-  } as React.ViewStyle
+  } as React.ViewStyle,
+
+  toolbar: {
+    height: 56,
+    backgroundColor:
+    "#009900",
+    elevation: 4} as React.ViewStyle,
+
 })
