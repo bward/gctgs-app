@@ -21,17 +21,23 @@ export class NavigationView extends React.Component<NavigationViewProps, {}> {
           <Text style={styles.name}>{this.props.user.name}</Text>
           <Text>{this.props.user.email}</Text>
         </View>
-        <TouchableNativeFeedback
-          onPress = {() => console.log('lol')}
+        {this.navigationItem('Log out', 'logout', this.props.onLogOut)}
+      </View>
+    );
+  }
+
+  private navigationItem(text: string, imageUri: string, onPress: () => void): JSX.Element {
+    return (
+      <TouchableNativeFeedback
+          onPress = {onPress}
           background = {TouchableNativeFeedback.SelectableBackground()}
           delayPressIn={0} >
           <View style = {styles.listItem}>
-            <Image source = {{uri: 'logout'}} style={styles.itemIcon} />
-            <Text style={styles.itemText}>Log out</Text>
+            <Image source = {{uri: imageUri}} style={styles.itemIcon} />
+            <Text style={styles.itemText}>{text}</Text>
           </View>
         </TouchableNativeFeedback>
-      </View>
-    );
+    )
   }
 }
 
