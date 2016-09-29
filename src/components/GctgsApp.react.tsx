@@ -14,7 +14,8 @@ import {
   DrawerLayoutAndroid,
   ToolbarAndroid,
   StyleSheet,
-  Navigator
+  Navigator,
+  BackAndroid
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
 import { NavigationView } from './NavigationView.react';
@@ -29,29 +30,31 @@ interface GctgsAppState {
 }
 
 export class GctgsApp extends React.Component<{}, GctgsAppState> {
+  private navigator: React.NavigatorStatic;
+  private drawerOpen: boolean;
+  private boardGameList: BoardGameList;
 
   public constructor() {
     super();
     this.state = {user: null, client: new GctgsWebClient()};
   }
 
-  public render() {
-    const routes = [
-      {id: 'boardGameList'},
-      {id: 'boardGameDetails'}
-    ];
-   
+  public render() {   
     return (
       <Navigator
-        initialRoute = {routes[0]}
-        initialRouteStack = {routes}
+        initialRoute = {{id: 'boardGameList'}}
         renderScene = {(route, navigator) => this.renderNavigatorScene(route, navigator) as React.ReactElement<React.ViewProperties>}
+        ref = {(navigator: any) => this.navigator = navigator}
       />
     );
-      
   }
 
-  public componentWillMount() {
+  public componentDidMount() {
+    this.logIn();
+    this.initBackButton();
+  }
+
+  private logIn() {
     AsyncStorage.getItem('user')
       .then((value: string) => {
         this.setState({user: JSON.parse(value)} as GctgsAppState);
@@ -59,7 +62,22 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
 
+  private initBackButton() {
+    BackAndroid.addEventListener('hardwareBackPress', () => {
+      if (this.boardGameList.drawerOpen) {
+        this.boardGameList.closeDrawer();
+        return true;
+      }
+      if (this.navigator.getCurrentRoutes().length > 1) {
+        this.navigator.pop();
+        return true;
+      }
+      return false;
+    });
+  }
+
   private renderNavigatorScene(route: React.Route, navigator: Navigator): React.ReactElement<React.ViewProperties> | undefined {
+    this.navigator
     if (this.state.user == null)
       return (
         <View style={{flex: 1}}>
@@ -78,7 +96,8 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
             user = {this.state.user}
             client = {this.state.client}
             logOut = {this.logOut.bind(this)}
-            navigator = {navigator} />
+            navigator = {navigator}
+            ref = {(boardGameList: any) => this.boardGameList = boardGameList}/>
         );
       case 'boardGameDetails':
         return (

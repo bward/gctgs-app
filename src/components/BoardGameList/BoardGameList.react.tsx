@@ -30,6 +30,9 @@ interface BoardGameListState {
 }
 
 export class BoardGameList extends React.Component<BoardGameListProps, BoardGameListState> {
+  public drawerOpen: boolean = false;
+  private drawer: React.DrawerLayoutAndroidStatic;
+
   public constructor() {
     super();
 
@@ -53,13 +56,15 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
             renderNavigationView = {() => <NavigationView
                                             user = {this.props.user}
                                             onLogOut = {this.props.logOut} />}
-            ref = {'DRAWER_REF'}>
+            ref = {(drawer: any) => this.drawer = drawer}
+            onDrawerOpen = {() => this.drawerOpen = true}
+            onDrawerClose = {() => this.drawerOpen = false} >
 
             <ToolbarAndroid
               title = "GCTGS"
               titleColor = "#ffffff"
-              navIcon= {{ uri: 'ic_menu_black_24dp', isStatic: true }}
-              onIconClicked={() => (this.refs['DRAWER_REF'] as any).openDrawer()}
+              navIcon = {{ uri: 'ic_menu_black_24dp', isStatic: true }}
+              onIconClicked = {() => this.drawer.openDrawer()}
               style = {styles.toolbar} />
 
               <View style={{flex: 1}}>
@@ -83,6 +88,10 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public componentDidMount() {
     this.onRefresh();
+  }
+
+  public closeDrawer() {
+    this.drawer.closeDrawer();
   }
 
   private onRefresh() {
