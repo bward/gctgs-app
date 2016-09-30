@@ -59,7 +59,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     AsyncStorage.getItem('user')
       .then((value: string) => {
         let user: User = JSON.parse(value);
-        this.setState({user, client: new GctgsWebClient(user)});
+        this.setState({user, client:  user != null ? new GctgsWebClient(user) : null});
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
@@ -119,7 +119,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
 
   private logOut() {
     CookieManager.clearAll((err: any, res: any) => {
-      this.setState({user: null} as GctgsAppState);
+      this.setState({user: null, client: null});
     });
   }
 }

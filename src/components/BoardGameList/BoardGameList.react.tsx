@@ -100,7 +100,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   private onRefresh() {
     this.setState({ refreshing: true } as BoardGameListState);
-    this.props.client.getBoardGames(this.props.user)
+    this.props.client.getBoardGames()
       .then((boardGames: BoardGame[]) => {
         const {dataBlob, sectionIds, rowIds} = this.formatDataAlphabetical(boardGames);
         this.setState({
