@@ -3,27 +3,34 @@ import {
   Image,
   Text,
   View,
-  StyleSheet
+  StyleSheet,
+  TouchableNativeFeedback
 } from 'react-native';
 import { BoardGame } from '../../models/BoardGame';
 
 interface BoardGameListRowProps {
   boardGame: BoardGame;
+  onPress: () => void;
 }
 
 export class BoardGameListRow extends React.Component<BoardGameListRowProps, {}> {
   public render() {
     return (
-      <View style = {styles.container} >
-        <Image style = {styles.image} source = {{uri: 'http:' + this.props.boardGame.bggDetails.thumbnailUrl}} />
-        <View>
-          <Text style = {styles.boardGameName}>{ this.props.boardGame.name }</Text>
-          <View style = {{flexDirection: 'row'}}>
-            <Text style = {styles.ownerName}>{this.props.boardGame.owner.name}</Text>
-            <Text style = {styles.location}> — {this.props.boardGame.location}</Text>
+      <TouchableNativeFeedback
+        background = {TouchableNativeFeedback.SelectableBackground()}
+        onPress = {this.props.onPress}
+        delayPressIn={0}>
+        <View style = {styles.container} >
+          <Image style = {styles.image} source = {{uri: 'http:' + this.props.boardGame.bggDetails.thumbnailUrl}} />
+          <View>
+            <Text style = {styles.boardGameName}>{ this.props.boardGame.name }</Text>
+            <View style = {{flexDirection: 'row'}}>
+              <Text style = {styles.ownerName}>{this.props.boardGame.owner.name}</Text>
+              <Text style = {styles.location}> — {this.props.boardGame.location}</Text>
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableNativeFeedback>
     );
   }
 }

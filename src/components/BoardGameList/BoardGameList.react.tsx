@@ -51,36 +51,36 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   public render() {
     return (
       <DrawerLayoutAndroid
-            drawerWidth = {304}
-            drawerPosition = {DrawerLayoutAndroid.positions.Left}
-            renderNavigationView = {() => <NavigationView
-                                            user = {this.props.user}
-                                            onLogOut = {this.props.logOut} />}
-            ref = {(drawer: any) => this.drawer = drawer}
-            onDrawerOpen = {() => this.drawerOpen = true}
-            onDrawerClose = {() => this.drawerOpen = false} >
+        drawerWidth={304}
+        drawerPosition={DrawerLayoutAndroid.positions.Left}
+        renderNavigationView={() => <NavigationView
+          user={this.props.user}
+          onLogOut={this.props.logOut} />}
+        ref={(drawer: any) => this.drawer = drawer}
+        onDrawerOpen={() => this.drawerOpen = true}
+        onDrawerClose={() => this.drawerOpen = false} >
 
-            <ToolbarAndroid
-              title = "GCTGS"
-              titleColor = "#ffffff"
-              navIcon = {{ uri: 'ic_menu_black_24dp', isStatic: true }}
-              onIconClicked = {() => this.drawer.openDrawer()}
-              style = {styles.toolbar} />
+        <ToolbarAndroid
+          title="GCTGS"
+          titleColor="#ffffff"
+          navIcon={{ uri: 'ic_menu_black_48dp', isStatic: true }}
+          onIconClicked={() => this.drawer.openDrawer()}
+          style={styles.toolbar} />
 
-              <View style={{flex: 1}}>
-                {this.state.boardGames.getRowCount() > 0
-                  ? <ListView
-                      dataSource = {this.state.boardGames}
-                      renderRow = {(rowData: BoardGame) => <BoardGameListRow boardGame = { rowData } />}
-                      renderSectionHeader = {(sectionData) => <BoardGameListSectionHeader title = {sectionData.title} />}
-                      renderHeader = {() => <View style = {styles.listHeader} />}
-                      enableEmptySections = { true }
-                      refreshControl = {<RefreshControl
-                                          refreshing = {this.state.refreshing}
-                                          onRefresh = {this.onRefresh.bind(this)} />}
-                    />
-                  : <ActivityIndicator size = 'large' style = {{flex: 1}}/> }
-              </View>
+        <View style={{ flex: 1 }}>
+          {this.state.boardGames.getRowCount() > 0
+            ? <ListView
+              dataSource={this.state.boardGames}
+              renderRow={(rowData: BoardGame) => <BoardGameListRow boardGame={rowData} onPress={() => this.boardGameDetails(rowData)} />}
+              renderSectionHeader={(sectionData) => <BoardGameListSectionHeader title={sectionData.title} />}
+              renderHeader={() => <View style={styles.listHeader} />}
+              enableEmptySections={true}
+              refreshControl={<RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh.bind(this)} />}
+              />
+            : <ActivityIndicator size='large' style={{ flex: 1 }} />}
+        </View>
 
       </DrawerLayoutAndroid>
     );
@@ -94,8 +94,12 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
     this.drawer.closeDrawer();
   }
 
+  private boardGameDetails(boardGame: BoardGame) {
+    this.props.navigator.push({ id: 'boardGameDetails', passProps: { boardGame, client: this.props.client } } as React.Route)
+  }
+
   private onRefresh() {
-    this.setState({refreshing: true} as BoardGameListState);
+    this.setState({ refreshing: true } as BoardGameListState);
     this.props.client.getBoardGames(this.props.user)
       .then((boardGames: BoardGame[]) => {
         const {dataBlob, sectionIds, rowIds} = this.formatDataAlphabetical(boardGames);
@@ -106,8 +110,8 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
       });
   }
 
-  private formatDataAlphabetical(data: BoardGame[]): {dataBlob: {[id: string]: BoardGame | {title: string}}, sectionIds: string[], rowIds: string[][]} {
-    const dataBlob: {[id: string]: BoardGame | {title: string}} = {'#': {title: '#'}};
+  private formatDataAlphabetical(data: BoardGame[]): { dataBlob: { [id: string]: BoardGame | { title: string } }, sectionIds: string[], rowIds: string[][] } {
+    const dataBlob: { [id: string]: BoardGame | { title: string } } = { '#': { title: '#' } };
     const sectionIds: string[] = ['#'];
     const rowIds: string[][] = [[]];
 
@@ -122,10 +126,10 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((character) => {
       const boardGames = data.filter(boardGame => boardGame.name.toUpperCase()[0] === character);
-      
+
       if (boardGames.length > 0) {
         sectionIds.push(character);
-        dataBlob[character] = {title: character};
+        dataBlob[character] = { title: character };
         rowIds.push([]);
         boardGames.map((boardGame, index) => {
           const rowId = `${character}:${index}`;
@@ -135,7 +139,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
       }
     });
 
-    return {dataBlob, sectionIds, rowIds};
+    return { dataBlob, sectionIds, rowIds };
   }
 }
 
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
   listHeader: {
     paddingTop: 16
   } as React.ViewStyle,
-    
+
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#8E8E8E',
@@ -154,6 +158,7 @@ const styles = StyleSheet.create({
     height: 56,
     backgroundColor:
     "#009900",
-    elevation: 4} as React.ViewStyle,
+    elevation: 4
+  } as React.ViewStyle,
 
 })

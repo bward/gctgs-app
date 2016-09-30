@@ -21,7 +21,7 @@ export class NavigationView extends React.Component<NavigationViewProps, {}> {
           <Text style={styles.name}>{this.props.user.name}</Text>
           <Text>{this.props.user.email}</Text>
         </View>
-        {this.navigationItem('Log out', 'logout', this.props.onLogOut)}
+        {this.navigationItem('Log out', 'ic_logout', this.props.onLogOut)}
       </View>
     );
   }

@@ -20,13 +20,14 @@ import {
 import { GctgsWebClient } from '../GctgsWebClient';
 import { NavigationView } from './NavigationView.react';
 import { BoardGameList } from './BoardGameList/BoardGameList.react';
+import { BoardGameDetails } from './BoardGameDetails.react';
 import { User } from '../models/User';
 
 const CookieManager = require('react-native-cookies');
 
 interface GctgsAppState {
   user: User | null;
-  client: GctgsWebClient;
+  client: GctgsWebClient | null;
 }
 
 export class GctgsApp extends React.Component<{}, GctgsAppState> {
@@ -36,7 +37,7 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
 
   public constructor() {
     super();
-    this.state = {user: null, client: new GctgsWebClient()};
+    this.state = {user: null, client: null};
   }
 
   public render() {   
@@ -57,7 +58,8 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   private logIn() {
     AsyncStorage.getItem('user')
       .then((value: string) => {
-        this.setState({user: JSON.parse(value)} as GctgsAppState);
+        let user: User = JSON.parse(value);
+        this.setState({user, client: new GctgsWebClient(user)});
       })
     Linking.addEventListener('url', this.authenticationHandler.bind(this));
   }
@@ -77,7 +79,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   }
 
   private renderNavigatorScene(route: React.Route, navigator: Navigator): React.ReactElement<React.ViewProperties> | undefined {
-    this.navigator
     if (this.state.user == null)
       return (
         <View style={{flex: 1}}>
@@ -94,22 +95,26 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
         return (
           <BoardGameList
             user = {this.state.user}
-            client = {this.state.client}
+            client = {this.state.client as GctgsWebClient}
             logOut = {this.logOut.bind(this)}
             navigator = {navigator}
             ref = {(boardGameList: any) => this.boardGameList = boardGameList}/>
         );
       case 'boardGameDetails':
         return (
-          <Text>Deets</Text>
-        )
+          <BoardGameDetails
+            boardGame = {(route.passProps as any).boardGame} 
+            navigator = {navigator}
+            client = {(route.passProps as any).client} />
+        );
     }
   }
 
   private authenticationHandler(event: {url: string}) {
     let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
-    AsyncStorage.setItem('user', userData)
-    this.setState({user: JSON.parse(userData) as User} as GctgsAppState);
+    AsyncStorage.setItem('user', userData);
+    let user = JSON.parse(userData);
+    this.setState({user, client: new GctgsWebClient(user)});
   }
 
   private logOut() {
