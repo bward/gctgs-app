@@ -103,13 +103,14 @@ export class BoardGameDetails extends React.Component<BoardGameDetailsProps, Boa
 const styles = StyleSheet.create({
   toolbar: {
     height: 56,
-    backgroundColor: "#009900",
+    backgroundColor: "#4CAF50",
     elevation: 4
   } as React.ViewStyle,
 
   container: {
     padding: 16,
     flex: 1,
+    backgroundColor: '#FAFAFA'
   } as React.ViewStyle,
 
   detail: {
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   } as React.ViewStyle,
 
   button: {
-    backgroundColor: "#009900",
+    backgroundColor: "#4CAF50",
     borderRadius: 2,
     height: 36,
     width: 80,

@@ -139,6 +139,6 @@ const styles = StyleSheet.create({
   toolbar: {
     height: 56,
     backgroundColor:
-    "#009900",
+    "#4CAF50",
     elevation: 4} as React.ViewStyle,
 });
