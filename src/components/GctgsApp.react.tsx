@@ -86,13 +86,15 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
     });
 
     FCM.on('notification', (notification: {requester: string, boardGame: string}) => {
-      let requester = JSON.parse(notification.requester);
-      let boardGame = JSON.parse(notification.boardGame);
-      Alert.alert(
-        'Board Game Request',
-        requester.Name + ' would like to play ' + boardGame.Name,
-        [{ text: 'OK' }]
-      )
+      if (notification.requester && notification.boardGame) {
+        let requester = JSON.parse(notification.requester);
+        let boardGame = JSON.parse(notification.boardGame);
+        Alert.alert(
+          'Board Game Request',
+          requester.Name + ' would like to play ' + boardGame.Name,
+          [{ text: 'OK' }]
+        )
+      }
     });
 }
 
