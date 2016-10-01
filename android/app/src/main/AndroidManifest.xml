@@ -11,29 +11,40 @@
         android:targetSdkVersion="22" />
 
     <application
-      android:name=".MainApplication"
-      android:allowBackup="true"
-      android:label="@string/app_name"
-      android:icon="@mipmap/ic_launcher"
-      android:theme="@style/AppTheme">
-      <activity
-        android:name=".MainActivity"
+        android:name=".MainApplication"
+        android:allowBackup="true"
         android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-        android:launchMode="singleTask">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        <intent-filter android:label="Board Game List">
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="gctgs"
-              android:host="authenticate" />
-        </intent-filter>
-      </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme">
+        <service android:name="com.evollu.react.fcm.MessagingService">
+            <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service android:name="com.evollu.react.fcm.InstanceIdService" android:exported="false">
+            <intent-filter>
+            <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:label="Board Game List">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="gctgs"
+                android:host="authenticate" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
 </manifest>
