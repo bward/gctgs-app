@@ -8,6 +8,7 @@ export class GctgsWebClient {
   public constructor(private user: User) {
     this.headers = new Headers();
     this.headers.append("X-GCTGS-Key", this.user.key);
+    this.headers.append("content-type", "application/json");
   }
 
   public getBoardGames(): Promise<BoardGame[]> {
@@ -19,6 +20,11 @@ export class GctgsWebClient {
 
   public requestBoardGame(boardGame: BoardGame): Promise<Response> {
     return fetch(this.baseUrl + '/request/' + boardGame.id.toString(), {headers: this.headers})
+      .catch((error: any) => console.log(error));
+  }
+
+  public setFCMToken(token: string): Promise<Response> {
+    return fetch(this.baseUrl + '/token', {headers: this.headers, method: 'PUT', body: JSON.stringify(token)})
       .catch((error: any) => console.log(error));
   }
 }

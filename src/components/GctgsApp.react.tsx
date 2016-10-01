@@ -24,6 +24,7 @@ import { BoardGameDetails } from './BoardGameDetails.react';
 import { User } from '../models/User';
 
 const CookieManager = require('react-native-cookies');
+const FCM = require('react-native-fcm');
 
 interface GctgsAppState {
   user: User | null;
@@ -51,17 +52,34 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
   }
 
   public componentDidMount() {
-    this.logIn();
+    this.tryLogInFromStorage();
     this.initBackButton();
   }
 
-  private logIn() {
+  private tryLogInFromStorage() {
     AsyncStorage.getItem('user')
       .then((value: string) => {
         let user: User = JSON.parse(value);
-        this.setState({user, client:  user != null ? new GctgsWebClient(user) : null});
+        if (user != null)
+          this.logIn(user);
+        else
+          Linking.addEventListener('url', this.authenticationHandler.bind(this));
       })
-    Linking.addEventListener('url', this.authenticationHandler.bind(this));
+  }
+
+  private authenticationHandler(event: {url: string}) {
+    let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
+    AsyncStorage.setItem('user', userData);
+    this.logIn(JSON.parse(userData));
+  }
+
+  private logIn(user: User) {
+    this.setState({user, client:  new GctgsWebClient(user)}, this.initFirebase.bind(this));
+  }
+
+  private initFirebase() {
+    FCM.getFCMToken()
+      .then((token: string) => (this.state.client as GctgsWebClient).setFCMToken(token));
   }
 
   private initBackButton() {
@@ -108,13 +126,6 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
             client = {(route.passProps as any).client} />
         );
     }
-  }
-
-  private authenticationHandler(event: {url: string}) {
-    let userData = decodeURIComponent(event.url.substr(event.url.indexOf("=") + 1));
-    AsyncStorage.setItem('user', userData);
-    let user = JSON.parse(userData);
-    this.setState({user, client: new GctgsWebClient(user)});
   }
 
   private logOut() {
