@@ -15,16 +15,16 @@ export class GctgsWebClient {
     return fetch(this.baseUrl + '/boardgames', {headers: this.headers})
       .then((response) => response.json())
       .then((responseJson) => responseJson as BoardGame[])
-      .catch((error: any) => console.log(error));
+      .catch((error: any) => console.log('get error', error));
   }
 
   public requestBoardGame(boardGame: BoardGame): Promise<Response> {
-    return fetch(this.baseUrl + '/request/' + boardGame.id.toString(), {headers: this.headers})
-      .catch((error: any) => console.log(error));
+    return fetch(this.baseUrl + '/request/' + boardGame.id.toString(), {headers: this.headers, method: 'POST'})
+      .catch((error: any) => console.log('request error', error));
   }
 
-  public setFCMToken(token: string): Promise<Response> {
+  public putFCMToken(token: string): Promise<Response> {
     return fetch(this.baseUrl + '/token', {headers: this.headers, method: 'PUT', body: JSON.stringify(token)})
-      .catch((error: any) => console.log(error));
+      .catch((error: any) => console.log('token error', error));
   }
 }

@@ -11,6 +11,7 @@ import {
   AsyncStorage,
   View,
   Text,
+  Alert,
   DrawerLayoutAndroid,
   ToolbarAndroid,
   StyleSheet,
@@ -22,6 +23,7 @@ import { NavigationView } from './NavigationView.react';
 import { BoardGameList } from './BoardGameList/BoardGameList.react';
 import { BoardGameDetails } from './BoardGameDetails.react';
 import { User } from '../models/User';
+import { BoardGame } from '../models/BoardGame';
 
 const CookieManager = require('react-native-cookies');
 const FCM = require('react-native-fcm');
@@ -79,8 +81,20 @@ export class GctgsApp extends React.Component<{}, GctgsAppState> {
 
   private initFirebase() {
     FCM.getFCMToken()
-      .then((token: string) => (this.state.client as GctgsWebClient).setFCMToken(token));
-  }
+      .then((token: string) => {
+      (this.state.client as GctgsWebClient).putFCMToken(token);
+    });
+
+    FCM.on('notification', (notification: {requester: string, boardGame: string}) => {
+      let requester = JSON.parse(notification.requester);
+      let boardGame = JSON.parse(notification.boardGame);
+      Alert.alert(
+        'Board Game Request',
+        requester.Name + ' would like to play ' + boardGame.Name,
+        [{ text: 'OK' }]
+      )
+    });
+}
 
   private initBackButton() {
     BackAndroid.addEventListener('hardwareBackPress', () => {

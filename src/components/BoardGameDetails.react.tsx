@@ -64,9 +64,9 @@ export class BoardGameDetails extends React.Component<BoardGameDetailsProps, Boa
                 </View>
               </TouchableNativeFeedback>
               : <View style={styles.loading}>
-                  <ActivityIndicator />
-                </View>
-              }
+                <ActivityIndicator />
+              </View>
+            }
           </View>
         </View>
       </View>
@@ -81,18 +81,14 @@ export class BoardGameDetails extends React.Component<BoardGameDetailsProps, Boa
           Alert.alert(
             'Success',
             'Hooray! Email request sent successfully',
-            [
-              { text: 'OK' }
-            ]
+            [{ text: 'OK' }]
           )
         }
         else {
           Alert.alert(
             'Error',
             'Something went wrong...',
-            [
-              { text: 'OK' }
-            ]
+            [{ text: 'OK' }]
           )
         }
         this.setState({ loading: false });
