@@ -6,12 +6,13 @@ import {
   WebView,
   Alert,
   ActivityIndicator,
-  ToolbarAndroid,
   TouchableNativeFeedback,
   StyleSheet
 } from 'react-native';
 import { GctgsWebClient } from '../GctgsWebClient';
 import { BoardGame } from '../models/BoardGame';
+
+const Icon = require('react-native-vector-icons/MaterialIcons');
 
 interface BoardGameDetailsProps {
   boardGame: BoardGame;
@@ -33,10 +34,10 @@ export class BoardGameDetails extends React.Component<BoardGameDetailsProps, Boa
   public render() {
     return (
       <View style={{ flex: 1 }}>
-        <ToolbarAndroid
+        <Icon.ToolbarAndroid
           title="Board Game Details"
           titleColor="#ffffff"
-          navIcon={{ uri: 'ic_arrow_back_black_48dp', isStatic: true }}
+          navIconName = "arrow-back"
           onIconClicked={() => this.props.navigator.pop()}
           style={styles.toolbar} />
         <View style={styles.container}>

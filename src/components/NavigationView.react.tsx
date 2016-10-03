@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { User } from '../models/User';
 
+const Icon = require('react-native-vector-icons/MaterialIcons');
+
 interface NavigationViewProps {
   user: User;
   onLogOut: () => void;
@@ -21,19 +23,19 @@ export class NavigationView extends React.Component<NavigationViewProps, {}> {
           <Text style={styles.name}>{this.props.user.name}</Text>
           <Text>{this.props.user.email}</Text>
         </View>
-        {this.navigationItem('Log out', 'ic_logout', this.props.onLogOut)}
+        {this.navigationItem('Log out', 'exit-to-app', this.props.onLogOut)}
       </View>
     );
   }
 
-  private navigationItem(text: string, imageUri: string, onPress: () => void): JSX.Element {
+  private navigationItem(text: string, iconName: string, onPress: () => void): JSX.Element {
     return (
       <TouchableNativeFeedback
           onPress = {onPress}
           background = {TouchableNativeFeedback.SelectableBackground()}
           delayPressIn={0} >
           <View style = {styles.listItem}>
-            <Image source = {{uri: imageUri}} style={styles.itemIcon} />
+            <Icon name = {iconName} size = {24} />
             <Text style={styles.itemText}>{text}</Text>
           </View>
         </TouchableNativeFeedback>
@@ -64,14 +66,13 @@ const styles = StyleSheet.create({
   } as React.ViewStyle,
 
   itemIcon: {
-    height: 24,
-    width: 24,
     marginRight: 32
-  } as React.ImageStyle,
+  },
 
   itemText: {
     fontFamily: 'sans-serif-medium',
     color: '#000000',
-    opacity: 0.87
+    opacity: 0.87,
+    paddingLeft: 32
   } as React.TextStyle
 })

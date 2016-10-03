@@ -44,3 +44,4 @@ typings/
 *.keystore
 
 google-services.json
+android/app/src/main/assets/fonts

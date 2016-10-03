@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Text,
   View,
-  ToolbarAndroid,
   ListView,
   ListViewDataSource,
   RefreshControl,
@@ -16,6 +15,8 @@ import { NavigationView } from '../NavigationView.react';
 import { GctgsWebClient } from '../../GctgsWebClient';
 import { BoardGame } from '../../models/BoardGame';
 import { User } from '../../models/User';
+
+const Icon = require('react-native-vector-icons/MaterialIcons');
 
 interface BoardGameListProps {
   user: User;
@@ -35,7 +36,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public constructor() {
     super();
-
     const dataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
@@ -60,10 +60,10 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
         onDrawerOpen={() => this.drawerOpen = true}
         onDrawerClose={() => this.drawerOpen = false} >
 
-        <ToolbarAndroid
+        <Icon.ToolbarAndroid
+          navIconName = "menu"
           title="GCTGS"
           titleColor="#ffffff"
-          navIcon={{ uri: 'ic_menu_black_48dp', isStatic: true }}
           onIconClicked={() => this.drawer.openDrawer()}
           style={styles.toolbar} />
 
