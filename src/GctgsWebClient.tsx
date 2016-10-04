@@ -1,5 +1,6 @@
 import { User } from './models/User'
 import { BoardGame } from './models/BoardGame';
+import { BoardGameRequest } from './models/BoardGameRequest'
 
 export class GctgsWebClient {
   private readonly baseUrl = 'https://gctgs.ben-ward.net/api';
@@ -15,7 +16,14 @@ export class GctgsWebClient {
     return fetch(this.baseUrl + '/boardgames', {headers: this.headers})
       .then((response) => response.json())
       .then((responseJson) => responseJson as BoardGame[])
-      .catch((error: any) => console.log('get error', error));
+      .catch((error: any) => console.log('get boardgames error', error));
+  }
+
+  public getRequests(): Promise<BoardGameRequest[]> {
+    return fetch(this.baseUrl + '/requests', {headers: this.headers})
+      .then((response) => response.json())
+      .then((responseJson) => responseJson as BoardGameRequest[])
+      .catch((error: any) => console.log('get requests error', error));
   }
 
   public requestBoardGame(boardGame: BoardGame): Promise<Response> {

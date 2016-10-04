@@ -10,13 +10,20 @@ import {
   StyleSheet
 } from 'react-native';
 import { BoardGameListRow } from './BoardGameListRow.react';
+import { RequestRow } from './RequestRow.react';
 import { BoardGameListSectionHeader } from './BoardGameListSectionHeader.react';
 import { NavigationView } from '../NavigationView.react';
 import { GctgsWebClient } from '../../GctgsWebClient';
 import { BoardGame } from '../../models/BoardGame';
+import { BoardGameRequest } from '../../models/BoardGameRequest';
 import { User } from '../../models/User';
 
 const Icon = require('react-native-vector-icons/MaterialIcons');
+
+enum DisplayMode {
+  boardGamesAlphabetical,
+  requests
+}
 
 interface BoardGameListProps {
   user: User;
@@ -27,7 +34,9 @@ interface BoardGameListProps {
 
 interface BoardGameListState {
   boardGames: ListViewDataSource;
+  requests: ListViewDataSource;
   refreshing: boolean;
+  displayMode: DisplayMode;
 }
 
 export class BoardGameList extends React.Component<BoardGameListProps, BoardGameListState> {
@@ -36,27 +45,61 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public constructor() {
     super();
-    const dataSource = new ListView.DataSource({
+    const boardGamesDataSource = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
       sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
       getSectionHeaderData: (dataBlob: any, sectionId: string) => dataBlob[sectionId],
       getRowData: (dataBlob: any, sectionId: string, rowId: string) => dataBlob[`${rowId}`]
     });
+    const requestDataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
-      boardGames: dataSource.cloneWithRowsAndSections([]),
-      refreshing: false
+      boardGames: boardGamesDataSource.cloneWithRowsAndSections([]),
+      requests: requestDataSource.cloneWithRows([]),
+      refreshing: false,
+      displayMode: DisplayMode.boardGamesAlphabetical
     }
   }
 
   public render() {
+    console.log('rendering lel', this.state.displayMode);
+    let list: JSX.Element;
+    console.log(this.state.requests)
+
+    if (this.state.boardGames.getRowCount() == 0)
+      list = <ActivityIndicator size='large' style={{ flex: 1 }} />
+    else if (this.state.displayMode == DisplayMode.requests)
+      list = <ListView
+              dataSource = {this.state.requests}
+              renderRow = {(rowData: BoardGameRequest) => <RequestRow request = {rowData} />}
+              renderHeader={() => <View style={styles.listHeader} />}
+              refreshControl={<RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh.bind(this)} />}
+              />
+    else
+      list = <ListView
+              dataSource={ this.state.boardGames}
+              renderRow={(rowData: BoardGame) => <BoardGameListRow boardGame={rowData} onPress={() => this.boardGameDetails(rowData)} />}
+              renderSectionHeader={(sectionData) => <BoardGameListSectionHeader title={sectionData.title} />}
+              renderHeader={() => <View style={styles.listHeader} />}
+              enableEmptySections={true}
+              refreshControl={<RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh.bind(this)} />}
+              />
+
     return (
       <DrawerLayoutAndroid
         drawerWidth={304}
         drawerPosition={DrawerLayoutAndroid.positions.Left}
-        renderNavigationView={() => <NavigationView
-          user={this.props.user}
-          onLogOut={this.props.logOut} />}
         ref={(drawer: any) => this.drawer = drawer}
+        renderNavigationView={() => <NavigationView
+                                      user = {this.props.user}
+                                      onBoardGames = {() => this.setState({displayMode: DisplayMode.boardGamesAlphabetical} as BoardGameListState)}
+                                      onRequests = {() => this.setState({displayMode: DisplayMode.requests} as BoardGameListState)}
+                                      onLogOut = {this.props.logOut}
+                                      drawer = {this.drawer}/>}
+        
         onDrawerOpen={() => this.drawerOpen = true}
         onDrawerClose={() => this.drawerOpen = false} >
 
@@ -68,18 +111,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
           style={styles.toolbar} />
 
         <View style={{ flex: 1 }}>
-          {this.state.boardGames.getRowCount() > 0
-            ? <ListView
-              dataSource={this.state.boardGames}
-              renderRow={(rowData: BoardGame) => <BoardGameListRow boardGame={rowData} onPress={() => this.boardGameDetails(rowData)} />}
-              renderSectionHeader={(sectionData) => <BoardGameListSectionHeader title={sectionData.title} />}
-              renderHeader={() => <View style={styles.listHeader} />}
-              enableEmptySections={true}
-              refreshControl={<RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this.onRefresh.bind(this)} />}
-              />
-            : <ActivityIndicator size='large' style={{ flex: 1 }} />}
+          { list }
         </View>
 
       </DrawerLayoutAndroid>
@@ -88,6 +120,10 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public componentDidMount() {
     this.onRefresh();
+  }
+
+  public componentDidUpdate() {
+    if (this.drawerOpen) this.closeDrawer();
   }
 
   public closeDrawer() {
@@ -105,6 +141,12 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
         const {dataBlob, sectionIds, rowIds} = this.formatDataAlphabetical(boardGames);
         this.setState({
           boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds),
+        } as BoardGameListState);
+      })
+      .then(() => this.props.client.getRequests())
+      .then((requests: BoardGameRequest[]) => {
+        this.setState({
+          requests: this.state.requests.cloneWithRows(requests),
           refreshing: false
         } as BoardGameListState);
       });
