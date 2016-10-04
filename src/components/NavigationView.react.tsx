@@ -14,6 +14,8 @@ interface NavigationViewProps {
   user: User;
   drawer: React.DrawerLayoutAndroidStatic;
   onBoardGames: () => void;
+  onLocations: () => void;
+  onOwners: () => void;
   onRequests: () => void;
   onLogOut: () => void;
 }
@@ -29,7 +31,10 @@ export class NavigationView extends React.Component<NavigationViewProps, {}> {
             </View>
           </Image>
         {this.navigationItem('Board Games', 'view-list', this.props.onBoardGames)}
-        {this.navigationItem('My Requests', 'people', this.props.onRequests)}
+        {this.navigationItem('Locations', 'place', this.props.onLocations)}
+        {this.navigationItem('Owners', 'people', this.props.onOwners)}
+        <View style = {styles.divider} />
+        {this.navigationItem('My Requests', 'question-answer', this.props.onRequests)}
         <View style = {styles.divider} />
         {this.navigationItem('Log out', 'exit-to-app', this.props.onLogOut)}
       </View>

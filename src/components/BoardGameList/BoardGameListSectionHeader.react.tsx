@@ -7,6 +7,7 @@ import {
 
 interface BoardGameListSectionHeaderProps {
   title: string;
+  index: number;
 }
 
 export class BoardGameListSectionHeader extends React.Component<BoardGameListSectionHeaderProps, {}> {
@@ -14,7 +15,7 @@ export class BoardGameListSectionHeader extends React.Component<BoardGameListSec
     return (
       <View style = {styles.container}>
         <View style = {styles.titleContainer}><Text>{this.props.title}</Text></View>
-        {this.props.title != '#' ? <View style = {styles.separator} /> : null}
+        {this.props.index != 0 ? <View style = {styles.separator} /> : null}
       </View>
     );
   }
