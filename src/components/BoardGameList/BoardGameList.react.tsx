@@ -130,7 +130,6 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
 
   public componentDidUpdate() {
     if (this.drawerOpen) this.closeDrawer();
-    this.listView.scrollTo({y: 0, animated: false})
   }
 
   public closeDrawer() {
@@ -144,6 +143,7 @@ export class BoardGameList extends React.Component<BoardGameListProps, BoardGame
   private setDisplay(displayMode: DisplayMode) {
     this.setState({displayMode: displayMode} as BoardGameListState);
     const {dataBlob, sectionIds, rowIds} = this.formatData(this.data, displayMode);
+    this.listView.scrollTo({y: 0, animated: false})
     this.setState({boardGames: this.state.boardGames.cloneWithRowsAndSections(dataBlob, sectionIds, rowIds)} as BoardGameListState);
   }
 
