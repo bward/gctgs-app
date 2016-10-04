@@ -90,8 +90,8 @@ android {
         applicationId "net.benward.gctgs"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 600
-        versionName "0.6.0"
+        versionCode 601
+        versionName "0.6.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
