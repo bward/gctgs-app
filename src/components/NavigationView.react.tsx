@@ -20,7 +20,17 @@ interface NavigationViewProps {
   onLogOut: () => void;
 }
 
-export class NavigationView extends React.Component<NavigationViewProps, {}> {
+interface NavigationViewState {
+  active: string;
+}
+
+export class NavigationView extends React.Component<NavigationViewProps, NavigationViewState> {
+
+  public constructor() {
+    super();
+    this.state = {active: 'Board Games'};
+  }
+
   public render() {
     return (
       <View>
@@ -44,15 +54,20 @@ export class NavigationView extends React.Component<NavigationViewProps, {}> {
   private navigationItem(text: string, iconName: string, onPress: () => void): JSX.Element {
     return (
       <TouchableNativeFeedback
-          onPress = {onPress}
+          onPress = {() => this.performNavigation(text, onPress)}
           background = {TouchableNativeFeedback.SelectableBackground()}
           delayPressIn = {0} >
-          <View style = {styles.listItem}>
-            <Icon name = {iconName} size = {24} />
-            <Text style = {styles.itemText}>{text}</Text>
+          <View style = {[styles.listItem, this.state.active === text ? styles.listItemActive : null]}>
+            <Icon name = {iconName} size = {24} color = {this.state.active === text ? "#4CAF50" : null} />
+            <Text style = {[styles.itemText, this.state.active === text ? styles.itemTextActive : null]}>{text}</Text>
           </View>
         </TouchableNativeFeedback>
     )
+  }
+
+  private performNavigation(text: string, onPress: () => void) {
+    onPress();
+    this.setState({active: text});
   }
 }
 
@@ -98,5 +113,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     opacity: .18,
     marginVertical: 8,
-  } as React.ViewStyle
+  } as React.ViewStyle,
+
+  listItemActive: {
+    backgroundColor: '#EEEEEE',
+  } as React.ViewStyle,
+
+  itemTextActive: {
+    color: '#4CAF50'
+  } as React.TextStyle
 })
